@@ -1,5 +1,8 @@
 streamlit
 numpy
 pandas
+seaborn
 scikit-learn
+factor-analyzer
 matplotlib>=3.9
+
