@@ -5,4 +5,6 @@ seaborn
 scikit-learn
 factor-analyzer
 matplotlib>=3.9
+openpyxl
+
 
