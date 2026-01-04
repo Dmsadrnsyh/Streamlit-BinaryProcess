@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
@@ -263,4 +264,5 @@ if "Analisis Faktor" in metode:
 
         st.write("### 🟩 Factor Scores per Observasi (Semua Grup)")
         st.dataframe(hasil_gabungan)
+
 
