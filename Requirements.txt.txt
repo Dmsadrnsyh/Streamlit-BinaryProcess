@@ -2,5 +2,3 @@ streamlit
 numpy
 pandas
 scikit-learn
-matplotlib>=3.9
-
