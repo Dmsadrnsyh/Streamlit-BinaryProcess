@@ -52,6 +52,12 @@ if uploaded_file:
 
     semua_kolom = list(data.columns)
 
+    # ✅ PILIH KOLOM PATOKAN
+    kolom_patokan = st.sidebar.selectbox(
+        "penentu baris proses (isi SERIAL / SBJNUM):",
+        semua_kolom
+    )
+
     jumlah_input = st.sidebar.number_input(
         "Jumlah Block Input:", min_value=1, max_value=20, value=1
     )
@@ -74,6 +80,16 @@ if uploaded_file:
 
     if st.sidebar.button("🔄 Proses Data"):
 
+        # ============================
+        # FILTER DATA BERDASARKAN KOLOM PATOKAN
+        # ============================
+        data_patokan = data[
+            data[kolom_patokan].notna()
+            & (data[kolom_patokan].astype(str).str.strip() != "")
+        ].copy()
+
+        st.info(f"Jumlah baris diproses: {len(data_patokan)} (berdasarkan {kolom_patokan})")
+
         list_df_output = []
 
         for idx in range(jumlah_input):
@@ -84,9 +100,15 @@ if uploaded_file:
                 st.error(f"Kolom target untuk inputan {idx+1} belum dipilih!")
                 st.stop()
 
-            input_produk = data[kol_input].dropna().tolist()
+            input_produk = (
+                data[kol_input]
+                .dropna()
+                .astype(str)
+                .str.lower()
+                .tolist()
+            )
 
-            df = proses_produk(data, input_produk, kol_target)
+            df = proses_produk(data_patokan, input_produk, kol_target)
 
             df = df.rename(columns={
                 "produk": f"produk_{idx+1}",
@@ -97,19 +119,19 @@ if uploaded_file:
 
         hasil_final = pd.concat(list_df_output, axis=1)
 
-        # Simpan ke session_state agar halaman Analisis bisa mengakses
+        # ============================
+        # OUTPUT
+        # ============================
         st.session_state["binary_output"] = hasil_final
-
         st.dataframe(hasil_final)
 
         buffer = BytesIO()
         with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
             hasil_final.to_excel(writer, index=False, sheet_name="hasil")
-        excel_data = buffer.getvalue()
 
         st.download_button(
             label="⬇️ Download Hasil Excel",
-            data=excel_data,
+            data=buffer.getvalue(),
             file_name="hasil_binary.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
